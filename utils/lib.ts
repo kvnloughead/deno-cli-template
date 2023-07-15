@@ -1,7 +1,5 @@
 import { path } from '../deps.ts';
 
-import { ALIASES } from './constants.ts';
-
 /**
  *
  * Confirms an action with the user if force is falsey.
@@ -28,18 +26,6 @@ export async function parseJsonFile(filepath: string): Promise<Options> {
 export function addUserDir(filepath: string) {
   const home = Deno.env.get('HOME') || '';
   return filepath.startsWith(home) ? filepath : path.join(home, filepath);
-}
-
-/**
- * Parses a cli command, returning original command, or the appropriate alias.
- *
- * @param {string} command - a cli command or alias
- * @returns {{string|undefined}} - the command corresponding to the alias, or else the original command param
- */
-export function parseCommand(command: string): string | undefined {
-  const commands = Object.keys(ALIASES.commands);
-  if (commands.includes(command)) return command;
-  return commands.find((key) => ALIASES.commands[key] === command) || command;
 }
 
 export function logError(err: Error) {

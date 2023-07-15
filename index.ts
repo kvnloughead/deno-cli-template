@@ -40,7 +40,7 @@ program
     return [];
   })
   // example subcommand
-  .command('example <arg>', 'Describe the command.')
+  .command('ex, e, example <arg>', 'Describe the command.')
   .arguments('<arg:string:exampleCompletion>')
   .option(
     '--flag <value>',
