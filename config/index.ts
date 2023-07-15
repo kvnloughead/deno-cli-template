@@ -1,11 +1,20 @@
-import { parseJsonFile, addUserDir } from "../utils/lib.ts";
+import { path } from '../deps.ts';
+
+import {
+  parseJsonFile,
+  addUserDir,
+  confirmAction,
+  logError,
+} from '../utils/lib.ts';
 
 /**
  * Retrieves configuration settings from a file, and merges them with the
  * specified command line arguments.
  *
- * User's can specify their own config file at an arbitrary location via the
+ * Users can specify their own config file at an arbitrary location via the
  * cfg field in the default config file, or via the --cfg command line flag.
+ *
+ * If the config file doesn't exist, the user will be prompted to create it.
  *
  * If the --dev flag is set, the development configuration will be
  * loaded from the devConfig field of the configuration file.
@@ -26,14 +35,25 @@ import { parseJsonFile, addUserDir } from "../utils/lib.ts";
  */
 export async function getConfig(
   cfgFile: string,
-  args: Options
-): Promise<{
-  [x: string]: unknown;
-  cfg: string;
-  force: boolean;
-  _: string[];
-}> {
-  let config = await parseJsonFile(addUserDir(cfgFile));
+  args: Options,
+): Promise<Options | undefined> {
+  let config: Options;
+  try {
+    config = await parseJsonFile(addUserDir(cfgFile));
+  } catch (err) {
+    if (err.name === 'NotFound') {
+      confirmAction(
+        false,
+        "Config file doesn't exist. Shall we create it? (y | n)",
+      );
+      await Deno.mkdir(path.parse(cfgFile).dir, { recursive: true });
+      await Deno.writeTextFile(cfgFile, `{ "cfg": "${cfgFile}" }`);
+      config = { cfg: cfgFile };
+    } else {
+      logError(err);
+      return;
+    }
+  }
 
   // if a config file is specified in the args, or in the default config file
   // parse the specified config file and add to configuration

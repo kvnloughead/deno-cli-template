@@ -30,7 +30,9 @@ program
   .globalOption('--cfg, --config <file>', 'Configuration file to use.', {
     default: DEFAULT_CONFIG,
   })
-  .globalOption('-f, --force', 'Take action without confirmation.')
+  .globalOption('-f, --force', 'Take action without confirmation.', {
+    default: false,
+  })
   .globalOption('-v, --verbose', 'Provides verbose logging.')
   .globalComplete('exampleCompletion', () => {
     // return array of completions consume the completion by specifying
